@@ -1,14 +1,25 @@
-import { Player, UserStateUpdate, UpdateGameArgs, GameEventMessage } from "../../types/interfaces";
-import { SocketEvent } from "../../types/enums";
+import {
+  Player,
+  UserStateUpdate,
+  UpdateGameArgs,
+  GameEventMessage,
+} from '../../types/interfaces';
+import { SocketEvent } from '../../types/enums';
 
-export function listenToPlayerEvents({ socket, setGameState, setGameEventMessages }: UpdateGameArgs): void {
+export function listenToPlayerEvents({
+  socket,
+  setGameState,
+  setGameEventMessages,
+}: UpdateGameArgs): void {
   if (!setGameState || !setGameEventMessages) {
-    console.error("setGameState or setGameEventMessages is not defined for updatePlayers function");
+    console.error(
+      'setGameState or setGameEventMessages is not defined for updatePlayers function'
+    );
     return;
   }
 
   socket.on(SocketEvent.UserStateUpdate, (userStateUpdate: UserStateUpdate) => {
-    let playerList: Player[] = [];
+    const playerList: Player[] = [];
     const { players, host } = userStateUpdate;
 
     players.forEach((player: Player) => {
@@ -20,7 +31,7 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
       });
     });
 
-    setGameState((prevState) => {
+    setGameState(prevState => {
       return {
         ...prevState,
         players: playerList,
@@ -35,17 +46,17 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
     let hostChanged: boolean = false;
     let me: string | null = null;
 
-    setGameState((prevState) => {
-      playerColor = prevState.players.find((player) => player.name === playerName)?.color;
-      hostColor = prevState.players.find((player) => player.name === host)?.color;
+    setGameState(prevState => {
+      playerColor = prevState.players.find(
+        player => player.name === playerName
+      )?.color;
+      hostColor = prevState.players.find(player => player.name === host)?.color;
       me = prevState.me;
-      host !== prevState.host
-        ? hostChanged = true
-        : hostChanged = false;
+      host !== prevState.host ? (hostChanged = true) : (hostChanged = false);
 
       // Remove the player who quit
-      const newPlayers = prevState.players.filter((player) => {
-        return player.name !== playerName
+      const newPlayers = prevState.players.filter(player => {
+        return player.name !== playerName;
       });
 
       // If there is only one player left, add a message to the lobby
@@ -57,7 +68,7 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
       // If final scores are shown, add playerleft value to the player that quit
       let finalScores = prevState.finalScores;
       if (finalScores.length > 0) {
-        finalScores = finalScores.map((player) => {
+        finalScores = finalScores.map(player => {
           if (player.name === playerName) {
             return {
               ...player,
@@ -65,8 +76,7 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
             };
           }
           return player;
-        }
-        );
+        });
       }
 
       return {
@@ -78,7 +88,7 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
       };
     });
 
-    setGameEventMessages((prev) => {
+    setGameEventMessages(prev => {
       const newMessages: GameEventMessage[] = [];
 
       newMessages.push({
@@ -86,7 +96,7 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
         id: Math.floor(Math.random() * 1000000),
         message: `${playerName} quit!`,
         colorClass: `${playerColor}Text`,
-        icon: "images/icons/error.png",
+        icon: 'images/icons/error.png',
       });
 
       // If host changes, add a message to the gameEventMessages
@@ -94,20 +104,20 @@ export function listenToPlayerEvents({ socket, setGameState, setGameEventMessage
         if (host === me) {
           newMessages.push({
             id: Math.floor(Math.random() * 1000000),
-            message: "You are the new host!",
+            message: 'You are the new host!',
             colorClass: `${hostColor}Text`,
-            icon: "images/icons/leader.png",
+            icon: 'images/icons/leader.png',
           });
         } else {
           newMessages.push({
             id: Math.floor(Math.random() * 1000000),
             message: `${host} is the new host!`,
             colorClass: `${hostColor}Text`,
-            icon: "images/icons/leader.png",
+            icon: 'images/icons/leader.png',
           });
         }
       }
       return prev.concat(newMessages);
     });
   });
-};
+}

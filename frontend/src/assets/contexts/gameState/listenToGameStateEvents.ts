@@ -1,10 +1,23 @@
-import { UpdateGameArgs, Player, GameState, GameEventMessage } from "../../types/interfaces";
-import {  CountdownType, Duration } from "../../types/types";
-import { SocketEvent } from "../../types/enums";
+import {
+  UpdateGameArgs,
+  Player,
+  GameState,
+  GameEventMessage,
+} from '../../types/interfaces';
+import { CountdownType, Duration } from '../../types/types';
+import { SocketEvent } from '../../types/enums';
 
-export function listenToGameStateEvents({ socket, setGameState, setViewState, setTimer, setGameEventMessages}: UpdateGameArgs): void {
+export function listenToGameStateEvents({
+  socket,
+  setGameState,
+  setViewState,
+  setTimer,
+  setGameEventMessages,
+}: UpdateGameArgs): void {
   if (!setGameState || !setViewState || !setTimer || !setGameEventMessages) {
-    console.error("setGameState or setViewState or setTimer or setGameEventMessages is not defined for listenToGameStateEvents function");
+    console.error(
+      'setGameState or setViewState or setTimer or setGameEventMessages is not defined for listenToGameStateEvents function'
+    );
     return;
   }
 
@@ -18,52 +31,67 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
     });
   });
 
-  socket.on(SocketEvent.GameStateUpdate, ({ players, resources, gameSpeed }) => {
-    const checkIfPredictedPositionIsSame = (current: Player, updated: Player) : boolean => {
-      if (!current.snake || !updated.snake) return false;
-      return current.snake.predictedPosition.head.x === updated.snake.predictedPosition.head.x &&
-        current.snake.predictedPosition.head.y === updated.snake.predictedPosition.head.y;
-    }
+  socket.on(
+    SocketEvent.GameStateUpdate,
+    ({ players, resources, gameSpeed }) => {
+      const checkIfPredictedPositionIsSame = (
+        current: Player,
+        updated: Player
+      ): boolean => {
+        if (!current.snake || !updated.snake) return false;
+        return (
+          current.snake.predictedPosition.head.x ===
+            updated.snake.predictedPosition.head.x &&
+          current.snake.predictedPosition.head.y ===
+            updated.snake.predictedPosition.head.y
+        );
+      };
 
-    setGameState((prevState) => {
-      const updatedPlayers = prevState.players.map((player) => {
-        const targetPlayer = players.find((p: Player) => p.name === player.name);
-        if (!targetPlayer) return player;
+      setGameState(prevState => {
+        const updatedPlayers = prevState.players.map(player => {
+          const targetPlayer = players.find(
+            (p: Player) => p.name === player.name
+          );
+          if (!targetPlayer) return player;
 
-        const snake = targetPlayer.snake;
-        const currentPosition = checkIfPredictedPositionIsSame(player, targetPlayer)
-          ? player.snake?.currentPosition
-          : { ...snake?.lastConfirmedPosition };
+          const snake = targetPlayer.snake;
+          const currentPosition = checkIfPredictedPositionIsSame(
+            player,
+            targetPlayer
+          )
+            ? player.snake?.currentPosition
+            : { ...snake?.lastConfirmedPosition };
+
+          return {
+            ...player,
+            speedMultiplier: targetPlayer.speedMultiplier,
+            score: targetPlayer.score,
+            snake: {
+              ...player.snake,
+              direction: snake?.direction,
+              predictedPosition: snake?.predictedPosition,
+              currentPosition,
+              alive: targetPlayer.isAlive,
+            },
+          };
+        });
 
         return {
-          ...player,
-          speedMultiplier: targetPlayer.speedMultiplier,
-          score: targetPlayer.score,
-          snake: {
-            ...player.snake,
-            direction: snake?.direction,
-            predictedPosition: snake?.predictedPosition,
-            currentPosition,
-            alive: targetPlayer.isAlive,
-          },
+          ...prevState,
+          gameSpeed,
+          resources,
+          players: updatedPlayers,
         };
       });
-
-      return {
-        ...prevState,
-        gameSpeed,
-        resources,
-        players: updatedPlayers,
-      };
-    });
-  });
+    }
+  );
 
   socket.on(SocketEvent.StartGame, ({ isPaused, players, gameSpeed }) => {
-    let restarted : boolean = false;
-    let restartHost : string | null = null;
-    let iamHost : boolean = false;
+    let restarted: boolean = false;
+    let restartHost: string | null = null;
+    let iamHost: boolean = false;
 
-    setGameState((prevState) => {
+    setGameState(prevState => {
       restarted = prevState.gameOn;
       restartHost = prevState.host;
       iamHost = prevState.me === prevState.host;
@@ -74,9 +102,11 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
         lobbyMessage: null,
         resources: [],
         gameSpeed: gameSpeed,
-        pause: {paused: isPaused, playerName: null},
-        players: prevState.players.map((player) => {
-          const snake = players.find((p: Player) => p.name === player.name)?.snake;
+        pause: { paused: isPaused, playerName: null },
+        players: prevState.players.map(player => {
+          const snake = players.find(
+            (p: Player) => p.name === player.name
+          )?.snake;
           return {
             name: player.name,
             color: player.color,
@@ -100,32 +130,32 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
       return startsState;
     });
 
-    setGameEventMessages((prev) => {
-      let restartMessage: GameEventMessage[] = [];
+    setGameEventMessages(prev => {
+      const restartMessage: GameEventMessage[] = [];
       if (restarted) {
         // generate a new random id
         const id = Math.floor(Math.random() * 1000000);
         restartMessage.push({
           id,
-          message: `${iamHost ? "You" : restartHost} restarted the game.`,
-          colorClass: "blackText",
-          icon: "images/icons/replay.png",
+          message: `${iamHost ? 'You' : restartHost} restarted the game.`,
+          colorClass: 'blackText',
+          icon: 'images/icons/replay.png',
         });
-      };
-      return restarted ? prev.concat(restartMessage) : []
+      }
+      return restarted ? prev.concat(restartMessage) : [];
     });
 
-    setViewState((prev) => {
+    setViewState(prev => {
       return {
         ...prev,
         status: 'inGame',
       };
     });
 
-    setTimer((prev) => {
+    setTimer(prev => {
       return {
         ...prev,
-        timeLeft: ("0" + Math.floor(prev.roundDuration / 60)) + ":" + "00",
+        timeLeft: '0' + Math.floor(prev.roundDuration / 60) + ':' + '00',
       };
     });
   });
@@ -137,7 +167,11 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
       const isHost = prevState.me === host;
       let lobbyMessage = null;
       if (!prevState.lobbyMessage) {
-        lobbyMessage = fromGame ? `${isHost ? "You" : host} decided to end the game and return to lobby. ` : null;
+        lobbyMessage = fromGame
+          ? `${
+              isHost ? 'You' : host
+            } decided to end the game and return to lobby. `
+          : null;
       } else {
         lobbyMessage = prevState.lobbyMessage;
       }
@@ -162,12 +196,14 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
         tie = true;
       }
 
-      let playerColor = prevState.players.find(player => player.name === winner.name)?.color;
+      const playerColor = prevState.players.find(
+        player => player.name === winner.name
+      )?.color;
 
       return {
         ...prevState,
         gameOn: false,
-        winner: {... winner, color: playerColor},
+        winner: { ...winner, color: playerColor },
         tie: tie,
         finalScores: prevState.players.map(player => {
           const score = scores.find((p: any) => p.name === player.name)?.score;
@@ -193,28 +229,29 @@ export function listenToGameStateEvents({ socket, setGameState, setViewState, se
     setViewState(prev => {
       return {
         ...prev,
-        status: "gameOver",
-      }
-    });;
+        status: 'gameOver',
+      };
+    });
   });
 
   socket.on(SocketEvent.TimerUpdate, (time: number) => {
-    setTimer((prev) => {
+    setTimer(prev => {
       return {
         ...prev,
-        timeLeft: ("0" + Math.floor(time / 60)) + ":" + ("0" + time % 60).slice(-2),
+        timeLeft:
+          '0' + Math.floor(time / 60) + ':' + ('0' + (time % 60)).slice(-2),
       };
     });
   });
 
   socket.on(SocketEvent.GameDuration, (gameDuration: Duration) => {
     setTimer({
-        roundDuration: gameDuration,
-        timeLeft: ("0" + Math.floor(gameDuration / 60)) + ":" + "00",
-      });
+      roundDuration: gameDuration,
+      timeLeft: '0' + Math.floor(gameDuration / 60) + ':' + '00',
+    });
   });
 
-  socket.on(SocketEvent.Countdown, (countdown) => {
+  socket.on(SocketEvent.Countdown, countdown => {
     let countdownMessage: CountdownType;
     if (typeof countdown === 'string') {
       countdownMessage = 'Slither!';
