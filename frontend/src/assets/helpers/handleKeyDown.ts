@@ -1,7 +1,7 @@
-import { HandleKeyDownArgs } from "../types/interfaces";
-import { SocketEvent } from "../types/enums";
+import { HandleKeyDownArgs } from '../types/interfaces';
+import { SocketEvent } from '../types/enums';
 
-let keyBuffer: string[] = [];
+const keyBuffer: string[] = [];
 let isProcessing = false;
 
 const processKeyBuffer = (socket: any, mySpeed: number) => {
@@ -11,7 +11,7 @@ const processKeyBuffer = (socket: any, mySpeed: number) => {
   }
 
   const direction = keyBuffer.shift();
-  socket.emit("move", direction);
+  socket.emit('move', direction);
   setTimeout(() => processKeyBuffer(socket, mySpeed), mySpeed);
 };
 
@@ -24,27 +24,27 @@ export const handleKeyDown = (args: HandleKeyDownArgs) => {
   let newDirection: string | null = null;
 
   switch (e.key) {
-    case "ArrowUp":
-    case "w":
-        newDirection = "up";
+    case 'ArrowUp':
+    case 'w':
+      newDirection = 'up';
       break;
 
-    case "ArrowDown":
-    case "s":
-        newDirection = "down";
+    case 'ArrowDown':
+    case 's':
+      newDirection = 'down';
       break;
 
-    case "ArrowLeft":
-    case "a":
-        newDirection = "left";
+    case 'ArrowLeft':
+    case 'a':
+      newDirection = 'left';
       break;
 
-    case "ArrowRight":
-    case "d":
-        newDirection = "right";
+    case 'ArrowRight':
+    case 'd':
+      newDirection = 'right';
       break;
 
-    case " ":
+    case ' ':
       socket.emit(SocketEvent.TogglePause);
       break;
 
