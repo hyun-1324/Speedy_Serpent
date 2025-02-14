@@ -52,7 +52,7 @@ export function listenToPlayerEvents({
       )?.color;
       hostColor = prevState.players.find(player => player.name === host)?.color;
       me = prevState.me;
-      host !== prevState.host ? (hostChanged = true) : (hostChanged = false);
+      hostChanged = host !== prevState.host ? true : false;
 
       // Remove the player who quit
       const newPlayers = prevState.players.filter(player => {
