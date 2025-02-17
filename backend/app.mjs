@@ -16,6 +16,7 @@ import {
   getPlayersInfo,
   isHost,
 } from './utils/playerUtils.js';
+import { isMultyPlay, togglePlayMode } from './utils/playModeUtils.js';
 import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -51,6 +52,12 @@ app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 // });
 
 io.on('connection', socket => {
+  if (!isMultyPlay && !isHost(socket.id)) {
+    socket.emit('error', { message: 'Multiplayer mode is disabled.' });
+    socket.disconnect();
+    return;
+  }
+
   if (!checkPlayerNumber(socket)) {
     socket.emit('error', { message: 'The room is full.' });
     socket.disconnect();
@@ -83,6 +90,24 @@ io.on('connection', socket => {
         });
       }
     });
+  });
+
+  socket.on('togglePlayMode', async () => {
+    togglePlayMode();
+    console.log(isMultyPlay);
+
+    if (!isMultyPlay) {
+      const clients = Array.from(io.sockets.sockets.keys());
+
+      clients.forEach(id => {
+        if (!isHost(id)) {
+          io.to(id).emit('error', {
+            message: 'Multiplayer mode is disabled.',
+          });
+          io.sockets.sockets.get(id)?.disconnect();
+        }
+      });
+    }
   });
 
   socket.on('startGame', async () => {

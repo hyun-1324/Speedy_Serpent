@@ -64,7 +64,7 @@ function isPlayerRegistered(socketId) {
 }
 
 function isHost(socketId) {
-  return playersInfo[socketId].name == hostPlayer;
+  return playersInfo[socketId]?.name == hostPlayer;
 }
 
 function getPlayersInfo() {

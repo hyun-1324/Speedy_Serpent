@@ -1,31 +1,45 @@
-import { FC, useEffect, useRef, useCallback, memo, useMemo } from "react";
-import { useGameState } from "../../contexts/gameState/GameStateContext";
-import { Resource, LethalCollision, ResourceCollision,  GameEventMessage } from "../../types/interfaces";
-import { isLethalCollision, isResourceCollision, moveSegment, handleLethalCollision, calculateSpeed } from "../../helpers/gameHelpers";
-import { handleKeyDown } from "../../helpers/handleKeyDown";
-import Countdown from "./Countdown";
-import useAudio from "../../audio/useAudio";
-import { SocketEvent } from "../../types/enums";
-import deadSound from "../../audio/soundFiles/dead.ogg";
-import resourceSound from "../../audio/soundFiles/resourceCollected.ogg";
-import speedSound from "../../audio/soundFiles/speedUp.ogg";
-import batchAddedSound from "../../audio/soundFiles/newResources.ogg";
-import slowDownSound from "../../audio/soundFiles/slowDown.ogg";
-import teleportSound from "../../audio/soundFiles/teleport.ogg";
-import speedBoostSound from "../../audio/soundFiles/speedBoost.ogg";
-import { SEGMENTSIZE, INITIALMOVEINTERVAL } from "../../types/constants";
-
+import { FC, useEffect, useRef, useCallback, memo, useMemo } from 'react';
+import { useGameState } from '../../contexts/gameState/GameStateContext';
+import {
+  Resource,
+  LethalCollision,
+  ResourceCollision,
+  GameEventMessage,
+} from '../../types/interfaces';
+import {
+  isLethalCollision,
+  isResourceCollision,
+  moveSegment,
+  handleLethalCollision,
+  calculateSpeed,
+} from '../../helpers/gameHelpers';
+import { handleKeyDown } from '../../helpers/handleKeyDown';
+import Countdown from './Countdown';
+import useAudio from '../../audio/useAudio';
+import { SocketEvent } from '../../types/enums';
+import deadSound from '../../audio/soundFiles/dead.ogg';
+import resourceSound from '../../audio/soundFiles/resourceCollected.ogg';
+import speedSound from '../../audio/soundFiles/speedUp.ogg';
+import batchAddedSound from '../../audio/soundFiles/newResources.ogg';
+import slowDownSound from '../../audio/soundFiles/slowDown.ogg';
+import teleportSound from '../../audio/soundFiles/teleport.ogg';
+import speedBoostSound from '../../audio/soundFiles/speedBoost.ogg';
+import { SEGMENTSIZE, INITIALMOVEINTERVAL } from '../../types/constants';
 
 const ResourceComponent = memo(({ resource }: { resource: Resource }) => (
-  <div
-    style={{ left: resource.x, bottom: resource.y }}
-    className="resource">
+  <div style={{ left: resource.x, bottom: resource.y }} className="resource">
     <img src={`images/resources/${resource.type}.png`} />
   </div>
 ));
 
 const Game: FC = () => {
-  const { gameState, setGameState, socket, getPlayercolor, setGameEventMessages } = useGameState();
+  const {
+    gameState,
+    setGameState,
+    socket,
+    getPlayercolor,
+    setGameEventMessages,
+  } = useGameState();
 
   const animationRef = useRef<number | null>(null);
   const lastUpdateTimeRef = useRef<number | null>(null);
@@ -36,16 +50,24 @@ const Game: FC = () => {
   const mySpeedRef = useRef<number>(0);
 
   const mySpeedMultiplier = useMemo(() => {
-    return gameState.players.filter((player) => player.name === gameState.me)[0].speedMultiplier;
+    return gameState.players.filter(player => player.name === gameState.me)[0]
+      .speedMultiplier;
   }, [gameState.players, gameState.me]);
 
   const iAmAlive = useMemo(() => {
-    return gameState.players.filter((player) => player.name === gameState.me)[0].snake?.alive;
+    return gameState.players.filter(player => player.name === gameState.me)[0]
+      .snake?.alive;
   }, [gameState.players, gameState.me]);
 
-  const resources: Resource[] = useMemo(() => gameState.resources, [gameState.resources]);
+  const resources: Resource[] = useMemo(
+    () => gameState.resources,
+    [gameState.resources]
+  );
   const countdown = useMemo(() => gameState.countDown, [gameState.countDown]);
-  const moveInterval = useMemo(() => gameState.gameSpeed, [gameState.gameSpeed]);
+  const moveInterval = useMemo(
+    () => gameState.gameSpeed,
+    [gameState.gameSpeed]
+  );
   const me = useMemo(() => gameState.me, [gameState.me]);
 
   const playDead = useAudio(deadSound);
@@ -56,54 +78,58 @@ const Game: FC = () => {
   const playSpeedBoost = useAudio(speedBoostSound);
   const playSlowDown = useAudio(slowDownSound);
 
-  const handleCollisions = useCallback((collisions: (ResourceCollision | LethalCollision)[]) => {
-    const newCollisions: GameEventMessage[] = [];
+  const handleCollisions = useCallback(
+    (collisions: (ResourceCollision | LethalCollision)[]) => {
+      const newCollisions: GameEventMessage[] = [];
 
-    collisions.forEach((collision) => {
-      if (isResourceCollision(collision)) {
-        // Play sound if I collide with a resource
-        const playerName = collision.playerName;
-        if (playerName === me) {
-          switch (collision.type.type) {
-            case "slowdown":
-              playSlowDown();
-              break;
-            case "teleport":
-              playTeleport();
-              break;
-            case "speedup":
-              playSpeedBoost();
-              break;
-            default:
-              playResource();
-              break;
+      collisions.forEach(collision => {
+        if (isResourceCollision(collision)) {
+          // Play sound if I collide with a resource
+          const playerName = collision.playerName;
+          if (playerName === me) {
+            switch (collision.type.type) {
+              case 'slowdown':
+                playSlowDown();
+                break;
+              case 'teleport':
+                playTeleport();
+                break;
+              case 'speedup':
+                playSpeedBoost();
+                break;
+              default:
+                playResource();
+                break;
+            }
+          }
+        } else if (isLethalCollision(collision)) {
+          const isMe = collision.playerName === me;
+          // Add message about lethal collision
+          if (collision.type.collision) {
+            const message = handleLethalCollision(
+              collision,
+              getPlayercolor,
+              isMe
+            );
+            newCollisions.push(message);
+
+            // Play sound if I die
+            if (isMe) {
+              playDead();
+            }
           }
         }
-
-      } else if (isLethalCollision(collision)) {
-        const isMe = collision.playerName === me;
-        // Add message about lethal collision
-        if (collision.type.collision) {
-          const message = handleLethalCollision(collision, getPlayercolor, isMe);
-          newCollisions.push(message);
-
-          // Play sound if I die
-          if (isMe) {
-            playDead();
-          }
-        }
-      }
-    });
-
-    // Add messages about new collisions to the state
-    if (newCollisions.length > 0) {
-      setGameEventMessages((prev) => {
-        return [...prev, ...newCollisions];
       });
-    }
 
-  }, [me]);
-
+      // Add messages about new collisions to the state
+      if (newCollisions.length > 0) {
+        setGameEventMessages(prev => {
+          return [...prev, ...newCollisions];
+        });
+      }
+    },
+    [me]
+  );
 
   const moveAndAnimate = useCallback((timestamp: number) => {
     if (!lastUpdateTimeRef.current) {
@@ -113,32 +139,33 @@ const Game: FC = () => {
     if (!pauseRef.current) {
       // Calculate distance to move every frame based on moveInterval and elapsed time
       const elapsedTime = timestamp - lastUpdateTimeRef.current;
-      let distance = (elapsedTime / (moveIntervalRef.current + 21)) * SEGMENTSIZE;
+      const distance =
+        (elapsedTime / (moveIntervalRef.current + 21)) * SEGMENTSIZE;
 
-      setGameState((prev) => {
+      setGameState(prev => {
         if (prev.players.length === 0) {
-          console.log("No players");
+          console.log('No players');
           return prev;
         }
 
         return {
           ...prev,
-          players: prev.players.map((player) => {
+          players: prev.players.map(player => {
             if (!player.snake?.currentPosition) {
-              console.log("No snake currentPosition");
+              console.log('No snake currentPosition');
               return player;
             }
             let playerSpeed = distance;
 
             // Adjust distance based on speedMultiplier
             if (player.speedMultiplier < 1) {
-              playerSpeed /= 2
+              playerSpeed /= 2;
             } else if (player.speedMultiplier > 1) {
-              playerSpeed *= 2
+              playerSpeed *= 2;
             }
 
             // Move the head one distance towards the target
-            const newSnake = {...player.snake};
+            const newSnake = { ...player.snake };
             const targetHead = newSnake.predictedPosition.head;
             let newHead = { ...newSnake.currentPosition.head };
 
@@ -147,14 +174,16 @@ const Game: FC = () => {
             // Update the body segments
             // Make body parts move one distance towards their target
             const targetBody = newSnake.predictedPosition.body;
-            const newBody = newSnake.currentPosition.body.map((segment, index) => {
-              const target = targetBody[index];
-              let newSegment = { ...segment };
+            const newBody = newSnake.currentPosition.body.map(
+              (segment, index) => {
+                const target = targetBody[index];
+                let newSegment = { ...segment };
 
-              newSegment = moveSegment(newSegment, target, playerSpeed);
+                newSegment = moveSegment(newSegment, target, playerSpeed);
 
-              return newSegment;
-            });
+                return newSegment;
+              }
+            );
 
             newSnake.currentPosition.head = newHead;
             newSnake.currentPosition.body = newBody;
@@ -164,7 +193,6 @@ const Game: FC = () => {
           }),
         };
       });
-
     }
 
     // Force style recalculation using getComputedStyle
@@ -174,7 +202,6 @@ const Game: FC = () => {
 
     lastUpdateTimeRef.current = timestamp;
     animationRef.current = requestAnimationFrame(moveAndAnimate);
-
   }, []);
 
   // Listen and handle collisions and resource batch added events
@@ -200,16 +227,15 @@ const Game: FC = () => {
   useEffect(() => {
     if (mySnakeRef.current && countdown === 3) {
       // Add the pulse class to your snake at the beginning of the game
-      mySnakeRef.current.classList.add("pulse");
+      mySnakeRef.current.classList.add('pulse');
 
       // Remove the pulse class after 5 seconds
       pulseTimeOutRef.current = setTimeout(() => {
         if (mySnakeRef.current) {
-          mySnakeRef.current.classList.remove("pulse");
+          mySnakeRef.current.classList.remove('pulse');
         }
       }, 5000);
-
-    };
+    }
   }, [countdown]);
 
   // Update mySpeedRef when gameSpeed or mySpeedMultiplier changes
@@ -219,16 +245,17 @@ const Game: FC = () => {
 
   // Update pauseRef when pause is toggled
   useEffect(() => {
-      pauseRef.current = gameState.pause.paused;
+    pauseRef.current = gameState.pause.paused;
   }, [gameState.pause.paused]);
 
   // Listen and handle key events
   useEffect(() => {
-    const keyDownHandler = (e: KeyboardEvent) => handleKeyDown({e, socket, mySpeed: mySpeedRef.current});
-    addEventListener("keydown", keyDownHandler);
+    const keyDownHandler = (e: KeyboardEvent) =>
+      handleKeyDown({ e, socket, mySpeed: mySpeedRef.current });
+    addEventListener('keydown', keyDownHandler);
 
     return () => {
-      removeEventListener("keydown", keyDownHandler);
+      removeEventListener('keydown', keyDownHandler);
     };
   }, [socket]);
 
@@ -236,43 +263,42 @@ const Game: FC = () => {
   useEffect(() => {
     const preloadImages = async () => {
       const imageUrls = [
-        "images/resources/teleport.png",
-        "images/resources/plain.png",
-        "images/resources/slowdown.png",
-        "images/resources/speedup.png",
-        "images/icons/dead.png",
-        "images/icons/replay.png",
-        "images/icons/error.png",
-        "images/icons/leader.png",
-        "images/buttons/playButton.png",
-        "images/buttons/restartButton.png",
-        "images/buttons/stopButton.png",
-        "images/buttons/toLobby.png",
+        'images/resources/teleport.png',
+        'images/resources/plain.png',
+        'images/resources/slowdown.png',
+        'images/resources/speedup.png',
+        'images/icons/dead.png',
+        'images/icons/replay.png',
+        'images/icons/error.png',
+        'images/icons/leader.png',
+        'images/buttons/playButton.png',
+        'images/buttons/restartButton.png',
+        'images/buttons/stopButton.png',
+        'images/buttons/toLobby.png',
       ];
 
-      const promises = imageUrls.map((url) => {
+      const promises = imageUrls.map(url => {
         return new Promise<void>((resolve, reject) => {
           const img = new Image();
           img.src = url;
           img.onload = () => resolve();
-          img.onerror = (error) => {
+          img.onerror = error => {
             reject(error);
-          }
+          };
         });
       });
 
       try {
         await Promise.all(promises);
       } catch (error) {
-        console.error("Error preloading images:", error);
+        console.error('Error preloading images:', error);
       }
     };
 
     preloadImages();
-
   }, []);
 
-   // Move the snake from lastConfirmed position to predicted position using requestAnimationFrame
+  // Move the snake from lastConfirmed position to predicted position using requestAnimationFrame
   useEffect(() => {
     animationRef.current = requestAnimationFrame(moveAndAnimate);
 
@@ -289,7 +315,7 @@ const Game: FC = () => {
   useEffect(() => {
     return () => {
       if (mySnakeRef.current) {
-        mySnakeRef.current.classList.remove("pulse");
+        mySnakeRef.current.classList.remove('pulse');
         mySnakeRef.current = null;
       }
       if (pulseTimeOutRef.current) {
@@ -299,19 +325,15 @@ const Game: FC = () => {
       pauseRef.current = false;
       mySpeedRef.current = 0;
       moveIntervalRef.current = 0;
-
-    }
+    };
   }, []);
 
   return (
     <div className="contentBox gameBox">
-      {gameState.players.map((player) => {
+      {gameState.players.map(player => {
         const isMySnake = player.name === me;
         return (
-          <div
-            key={player.name}
-            ref={isMySnake ? mySnakeRef : null}
-            >
+          <div key={player.name} ref={isMySnake ? mySnakeRef : null}>
             {player.snake?.alive && (
               <>
                 <div
@@ -341,15 +363,14 @@ const Game: FC = () => {
         );
       })}
 
-      {resources.map((resource) => (
+      {resources.map(resource => (
         <ResourceComponent key={resource.id} resource={resource} />
       ))}
 
       {!iAmAlive && <div className="youDied">YOUR SNAKE DIED!</div>}
-      {countdown !== "over" && <Countdown/>}
-
+      {countdown !== 'over' && <Countdown />}
     </div>
-  )
+  );
 };
 
 export default memo(Game);

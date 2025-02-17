@@ -1,20 +1,26 @@
-import { useState, FC, useEffect } from "react";
-import { LobbyMessage } from "../../types/types";
-import { useGameState } from "../../contexts/gameState/GameStateContext";
-import { quitGame } from "../../helpers/gameControls";
-import Playerlist from "./Playerlist";
-import Button from "../reusable/Button";
-import Toggle from "../reusable/Toggle";
-import ThreeOptionSlider from "../reusable/ThreeOptionSlider";
-import BotPlayers from "./BotPlayers";
-import { SocketEvent } from "../../types/enums";
+import { useState, FC, useEffect } from 'react';
+import { LobbyMessage } from '../../types/types';
+import { useGameState } from '../../contexts/gameState/GameStateContext';
+import { quitGame } from '../../helpers/gameControls';
+import Playerlist from './Playerlist';
+import Button from '../reusable/Button';
+import Toggle from '../reusable/Toggle';
+import ThreeOptionSlider from '../reusable/ThreeOptionSlider';
+import BotPlayers from './BotPlayers';
+import { SocketEvent } from '../../types/enums';
 
 const Lobby: FC = () => {
-
-  const [stateMessage, setStateMessage] = useState<LobbyMessage>("");
+  const [stateMessage, setStateMessage] = useState<LobbyMessage>('');
   const [isMultiplayer, setIsMultiplayer] = useState<boolean>(true);
 
-  const { gameState, setGameState, setViewState, socket, setGameEventMessages, timer } = useGameState();
+  const {
+    gameState,
+    setGameState,
+    setViewState,
+    socket,
+    setGameEventMessages,
+    timer,
+  } = useGameState();
   const playersList = gameState.players;
   const isHost = gameState.host == gameState.me;
   const additionalMessage = gameState.lobbyMessage;
@@ -22,16 +28,15 @@ const Lobby: FC = () => {
 
   useEffect(() => {
     if (playersList.length === 1) {
-      setStateMessage("Waiting for others to join the game...");
+      setStateMessage('Waiting for others to join the game...');
     } else {
       if (isHost) {
-        setStateMessage("Start the game when everyone is ready!");
+        setStateMessage('Start the game when everyone is ready!');
       } else {
-        setStateMessage("Waiting for the host to start the game...");
+        setStateMessage('Waiting for the host to start the game...');
       }
     }
   }, [playersList, isHost]);
-
 
   return (
     <div id="lobby" className="contentBox flexColumn">
@@ -39,13 +44,23 @@ const Lobby: FC = () => {
 
       <div className="flexColumn playerList">
         <h2 className="margin10 center">Players:</h2>
-        {isMultiplayer ? <Playerlist /> : <BotPlayers player={playersList[0]} />}
+        {isMultiplayer ? (
+          <Playerlist />
+        ) : (
+          <BotPlayers player={playersList[0]} />
+        )}
       </div>
 
       <div className="center">
-        {additionalMessage && <p className="margin5 smallFont">{additionalMessage}</p>}
+        {additionalMessage && (
+          <p className="margin5 smallFont">{additionalMessage}</p>
+        )}
         <p className="margin5 smallFont">{stateMessage}</p>
-        {!isHost && <p className="margin5 smallFont">Round duration: {roundInMins} minutes</p>}
+        {!isHost && (
+          <p className="margin5 smallFont">
+            Round duration: {roundInMins} minutes
+          </p>
+        )}
       </div>
 
       {isHost && <div className="divider"></div>}
@@ -54,24 +69,33 @@ const Lobby: FC = () => {
         <Button
           imageSRC="images/buttons/stopButton.png"
           alt="Quit Game"
-          onClick={() => quitGame({socket, setGameState, setViewState, setGameEventMessages})}
+          onClick={() =>
+            quitGame({
+              socket,
+              setGameState,
+              setViewState,
+              setGameEventMessages,
+            })
+          }
           tooltip="Leave the game"
         />
 
-        {isHost &&
+        {isHost && (
           <>
             <div className="center width190">
               <p className="margin0 smallFont">Game Mode:</p>
               <Toggle
                 isMultiplayer={isMultiplayer}
-                 disabled={true}
-                // TODO: Send socket message multiplayer/single player mode
-                onToggle={() => setIsMultiplayer(!isMultiplayer)}
+                onToggle={() => {
+                  setIsMultiplayer(!isMultiplayer);
+                  socket.emit(SocketEvent.TogglePlayMode);
+                }}
               />
-              {isMultiplayer
-                ? <p className="margin0 smallFont">Multiplayer mode enabled!</p>
-                : <p className="margin0 smallFont">Singleplayer mode enabled!</p>
-              }
+              {isMultiplayer ? (
+                <p className="margin0 smallFont">Multiplayer mode enabled!</p>
+              ) : (
+                <p className="margin0 smallFont">Singleplayer mode enabled!</p>
+              )}
             </div>
 
             <div className="center width190">
@@ -80,18 +104,21 @@ const Lobby: FC = () => {
             </div>
 
             <Button
-              imageSRC={ playersList.length < 2 ? "images/buttons/playButtonDisabled.png" : "images/buttons/playButton.png" }
+              imageSRC={
+                playersList.length < 2
+                  ? 'images/buttons/playButtonDisabled.png'
+                  : 'images/buttons/playButton.png'
+              }
               alt="Start Game"
               disabled={playersList.length < 2}
               onClick={() => socket.emit(SocketEvent.StartGame)}
               tooltip="Start the game"
             />
           </>
-        }
-
+        )}
       </div>
     </div>
-  )
+  );
 };
 
 export default Lobby;

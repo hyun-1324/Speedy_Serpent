@@ -1,5 +1,5 @@
-import { UpdateGameArgs } from "../../types/interfaces";
-import { SocketEvent, ErrorType } from "../../types/enums";
+import { UpdateGameArgs } from '../../types/interfaces';
+import { SocketEvent, ErrorType } from '../../types/enums';
 
 export function listenToErrors({
   socket,
@@ -64,6 +64,9 @@ export function listenToErrors({
       case 'The game has already started.':
         errorType = ErrorType.gameStarted;
         break;
+      case 'Multiplayer mode is disabled.':
+        errorType = ErrorType.SinglePlayMode;
+        break;
       default:
         errorType = ErrorType.empty;
         break;
@@ -85,4 +88,4 @@ export function listenToErrors({
       });
     }
   });
-};
+}
