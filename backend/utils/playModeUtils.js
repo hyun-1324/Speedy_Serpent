@@ -4,4 +4,8 @@ function togglePlayMode() {
   isMultyPlay = !isMultyPlay;
 }
 
-export { isMultyPlay, togglePlayMode };
+function setMultyPlayMode() {
+  isMultyPlay = true;
+}
+
+export { isMultyPlay, togglePlayMode, setMultyPlayMode };

@@ -1,3 +1,5 @@
+import { setMultyPlayMode } from './playModeUtils.js';
+
 const MAX_PLAYERS = 4;
 let playersInfo = {};
 let availableUserColors = ['red', 'blue', 'yellow', 'green'];
@@ -21,6 +23,7 @@ function registerPlayer(socket, playerName, callback) {
     const playerColor = availableUserColors.shift();
     playersInfo[socket.id] = { name: playerName, color: playerColor };
     if (!hostPlayer) {
+      setMultyPlayMode();
       hostPlayer = playersInfo[socket.id].name;
       callback({
         success: true,

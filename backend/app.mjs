@@ -56,9 +56,7 @@ io.on('connection', socket => {
     socket.emit('error', { message: 'Multiplayer mode is disabled.' });
     socket.disconnect();
     return;
-  }
-
-  if (!checkPlayerNumber(socket)) {
+  } else if (!checkPlayerNumber(socket)) {
     socket.emit('error', { message: 'The room is full.' });
     socket.disconnect();
     return;
@@ -94,7 +92,6 @@ io.on('connection', socket => {
 
   socket.on('togglePlayMode', async () => {
     togglePlayMode();
-    console.log(isMultyPlay);
 
     if (!isMultyPlay) {
       const clients = Array.from(io.sockets.sockets.keys());
