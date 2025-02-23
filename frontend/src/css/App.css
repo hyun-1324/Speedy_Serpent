@@ -273,6 +273,10 @@ option {
   background-color: var(--white);
 }
 
+.white {
+  background-color: var(--white1);
+}
+
 .green {
   background-color: var(--green1);
 }
