@@ -33,6 +33,7 @@ export enum ErrorType {
   connectionError = 'connectionError',
   gameStarted = 'gameStarted',
   SinglePlayMode = 'singlePlayMode',
+  MultyPlayMode = 'multyPlayMode',
   empty = '',
 }
 

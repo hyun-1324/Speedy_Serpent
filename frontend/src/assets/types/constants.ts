@@ -6,6 +6,7 @@ export const INITIALMOVEINTERVAL = 200;
 
 export const initialGameState: GameState = {
   gameOn: false,
+  isMultiplayer: true,
   lobbyMessage: null,
   error: ErrorType.empty,
   players: [],
@@ -14,7 +15,7 @@ export const initialGameState: GameState = {
   winner: null,
   tie: false,
   gameSpeed: 0,
-  pause: {paused: false, playerName: null},
+  pause: { paused: false, playerName: null },
   countDown: null,
   resources: [],
   finalScores: [],

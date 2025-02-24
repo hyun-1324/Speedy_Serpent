@@ -3,7 +3,9 @@ import { CollisionCause } from './enums';
 export type LobbyMessage =
   | 'Waiting for the host to start the game...'
   | 'Waiting for others to join the game...'
+  | 'Add AI opponents.'
   | 'Start the game when everyone is ready!'
+  | 'Start the game when you are ready!'
   | '';
 
 export type View =
@@ -22,9 +24,24 @@ export type EntryErrorMessage =
   | 'The room you are trying to join is full.'
   | 'There was an error connecting to the server.'
   | 'Multiplayer mode is disabled.'
+  | 'Singleplayer mode is disabled.'
   | 'The game has already started.';
 
-export type BotColor = 'red' | 'green' | 'yellow';
+export type BotColor = 'red' | 'green' | 'yellow' | 'blue';
+
+export type BotId = 'bot1' | 'bot2' | 'bot3';
+
+export type BotLevels =
+  | 'none'
+  | 'easy(Safe and Efficient)'
+  | 'easy(Aggressive)'
+  | 'easy(Bold and Fast-paced)'
+  | 'medium(Safe and Efficient)'
+  | 'medium(Aggressive)'
+  | 'medium(Bold and Fast-paced)'
+  | 'hard(Safe and Efficient)'
+  | 'hard(Aggressive)'
+  | 'hard(Bold and Fast-paced)';
 
 export type RegistrationResultMessage =
   | 'Name already taken'
