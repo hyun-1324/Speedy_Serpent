@@ -2,7 +2,7 @@ import { GameState } from './interfaces';
 import { ErrorType } from './enums';
 
 export const SEGMENTSIZE = 18;
-export const INITIALMOVEINTERVAL = 200;
+export const INITIALMOVEINTERVAL = 300;
 
 export const initialGameState: GameState = {
   gameOn: false,
