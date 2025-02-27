@@ -1,6 +1,6 @@
 import { playersInfo, availableUserColors } from './playerUtils.js';
 
-function registerBotPlayer(botId, botColor, botLevel, callback) {
+function registerBotPlayer(botId, botColor, botLevel, botBehavior, callback) {
   if (botLevel === 'none') {
     const PlayerInfo = playersInfo[botId];
     if (PlayerInfo) {
@@ -12,6 +12,7 @@ function registerBotPlayer(botId, botColor, botLevel, callback) {
       name: `${botColor} bot`,
       color: botColor,
       botLevel: botLevel,
+      ...(botBehavior && { botBehavior }),
     };
 
     availableUserColors.splice(

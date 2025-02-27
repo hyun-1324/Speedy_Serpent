@@ -363,6 +363,30 @@ option {
   border-radius: 5px;
 }
 
+/* Bot configuration styles */
+.botConfigContainer {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 2px 0;
+  gap: 5px;
+}
+
+.botLevelSelect {
+  flex-grow: 1;
+  min-width: 120px;
+}
+
+.botBehaviorSelect {
+  min-width: 150px;
+  background-color: var(--white);
+  border: var(--gray) 1px solid;
+  border-radius: 4px;
+  padding: 7px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
 .stateMessageBox {
   display: flex;
   flex-direction: column;

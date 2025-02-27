@@ -31,17 +31,12 @@ export type BotColor = 'red' | 'green' | 'yellow' | 'blue';
 
 export type BotId = 'bot1' | 'bot2' | 'bot3';
 
-export type BotLevels =
-  | 'none'
-  | 'easy(Safe and Efficient)'
-  | 'easy(Aggressive)'
-  | 'easy(Bold and Fast-paced)'
-  | 'medium(Safe and Efficient)'
-  | 'medium(Aggressive)'
-  | 'medium(Bold and Fast-paced)'
-  | 'hard(Safe and Efficient)'
-  | 'hard(Aggressive)'
-  | 'hard(Bold and Fast-paced)';
+export type BotLevel = 'none' | 'easy' | 'medium' | 'hard';
+
+export type BotBehavior =
+  | 'safeAndEfficient'
+  | 'aggressive'
+  | 'boldAndFastPaced';
 
 export type RegistrationResultMessage =
   | 'Name already taken'

@@ -106,6 +106,7 @@ io.on('connection', socket => {
       botInfo.botId,
       botInfo.botColor,
       botInfo.botLevel,
+      botInfo.botBehavior,
       result => {
         if (result.success) {
           socket.emit('userStateUpdate', {
