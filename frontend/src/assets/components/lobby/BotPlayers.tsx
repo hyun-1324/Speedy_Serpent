@@ -24,20 +24,20 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
   );
 
   const [botColors, setBotColors] = useState<{ [key in BotId]?: BotColor }>({
-    0: undefined,
-    1: undefined,
-    2: undefined,
+    bot1: undefined,
+    bot2: undefined,
+    bot3: undefined,
   });
 
   const [botLevelsState, setBotLevelsState] = useState<{
     [key in BotId]?: BotLevels;
   }>({
-    0: 'none',
-    1: 'none',
-    2: 'none',
+    bot1: 'none',
+    bot2: 'none',
+    bot3: 'none',
   });
 
-  const botId: BotId[] = [0, 1, 2];
+  const botId: BotId[] = ['bot1', 'bot2', 'bot3'];
 
   const sendBotLevelChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -54,7 +54,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
         ...prevLevels,
         [botId]: 'none',
       }));
-      socket.emit('botLevelChange', {
+      socket.emit('registerBotPlayer', {
         botId: botId,
         botColor: undefined,
         botLevel,
@@ -80,7 +80,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
         [botId]: botLevel,
       }));
 
-      socket.emit('botLevelChange', {
+      socket.emit('registerBotPlayer', {
         botId: botId,
         botColor: assignedColor,
         botLevel,

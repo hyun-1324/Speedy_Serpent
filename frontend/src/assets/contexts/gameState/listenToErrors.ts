@@ -67,6 +67,9 @@ export function listenToErrors({
       case 'Multiplayer mode is disabled.':
         errorType = ErrorType.SinglePlayMode;
         break;
+      case 'Singleplayer mode is disabled.':
+        errorType = ErrorType.MultyPlayMode;
+        break;
       default:
         errorType = ErrorType.empty;
         break;

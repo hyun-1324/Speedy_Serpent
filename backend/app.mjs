@@ -13,9 +13,10 @@ import {
   removePlayer,
   getHost,
   isPlayerRegistered,
-  getPlayersInfo,
+  playersInfo,
   isHost,
 } from './utils/playerUtils.js';
+import { registerBotPlayer, removeBotPlayers } from './utils/botPlayerUtils.js';
 import { isMultyPlay, togglePlayMode } from './utils/playModeUtils.js';
 import cors from 'cors';
 
@@ -84,10 +85,36 @@ io.on('connection', socket => {
       if (result.success) {
         io.emit('userStateUpdate', {
           host: getHost(),
-          players: Object.values(getPlayersInfo()),
+          players: Object.values(playersInfo),
         });
       }
     });
+  });
+
+  socket.on('registerBotPlayer', botInfo => {
+    if (isMultyPlay) {
+      socket.emit('error', { message: 'Singleplayer mode is disabled.' });
+      socket.disconnect();
+      return;
+    } else if (gameState.isStarted) {
+      socket.emit('error', { message: 'The game has already started.' });
+      socket.disconnect();
+      return;
+    }
+
+    registerBotPlayer(
+      botInfo.botId,
+      botInfo.botColor,
+      botInfo.botLevel,
+      result => {
+        if (result.success) {
+          socket.emit('userStateUpdate', {
+            host: getHost(),
+            players: Object.values(playersInfo),
+          });
+        }
+      }
+    );
   });
 
   socket.on('togglePlayMode', async () => {
@@ -103,6 +130,12 @@ io.on('connection', socket => {
           });
           io.sockets.sockets.get(id)?.disconnect();
         }
+      });
+    } else {
+      removeBotPlayers();
+      socket.emit('userStateUpdate', {
+        host: getHost(),
+        players: Object.values(playersInfo),
       });
     }
   });
@@ -139,7 +172,7 @@ io.on('connection', socket => {
     const isPaused = gameState.togglePause();
     io.emit('gamePauseStateChanged', {
       isPaused,
-      pausedBy: getPlayersInfo()[socket.id].name,
+      pausedBy: playersInfo[socket.id].name,
     });
   });
 
@@ -147,6 +180,14 @@ io.on('connection', socket => {
     if (!isHost(socket.id)) {
       socket.emit('error', { message: 'You are not the host!' });
       return;
+    }
+
+    if (!isMultyPlay) {
+      removeBotPlayers();
+      socket.emit('userStateUpdate', {
+        host: getHost(),
+        players: Object.values(playersInfo),
+      });
     }
 
     gameState.backToLobby();
@@ -159,7 +200,7 @@ io.on('connection', socket => {
       return;
     }
 
-    const playerName = getPlayersInfo()[socket.id].name;
+    const playerName = playersInfo[socket.id].name;
     players.updatePlayerDirection(playerName, direction);
   });
 
@@ -179,11 +220,15 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     if (!isPlayerRegistered(socket.id)) return;
 
-    const playerName = getPlayersInfo()[socket.id].name;
+    if (!isMultyPlay) {
+      removeBotPlayers();
+    }
+
+    const playerName = playersInfo[socket.id].name;
 
     removePlayer(socket);
 
-    if (gameState.isStarted) {
+    if (gameState.isStarted && isMultyPlay) {
       // If the game has started and the player disconnects/quits, send only a playerQuit event
       players.removePlayer(playerName);
 
@@ -196,11 +241,14 @@ io.on('connection', socket => {
         gameState.backToLobby();
         io.emit('backTolobby', gameState.getGameState());
       }
+    } else if (gameState.isStarted && !isMultyPlay) {
+      players.removePlayer(playerName);
+      gameState.backToLobby();
     } else {
       // Use userStateUpdate event to update the user list if the game has not started
       io.emit('userStateUpdate', {
         host: getHost(),
-        players: Object.values(getPlayersInfo()),
+        players: Object.values(playersInfo),
       });
     }
   });

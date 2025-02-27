@@ -1,18 +1,33 @@
 import { playersInfo, availableUserColors } from './playerUtils.js';
-import { isMultyPlay } from './playModeUtils.js';
 
-function registerBotPlayer(botNumber, botColor, callback) {
-  playersInfo[botNumber] = { name: `${botColor} bot`, color: botColor };
-  availableUserColors = availableUserColors.filter(item => item !== botColor);
+function registerBotPlayer(botId, botColor, botLevel, callback) {
+  if (botLevel === 'none') {
+    const PlayerInfo = playersInfo[botId];
+    if (PlayerInfo) {
+      availableUserColors.push(PlayerInfo.color);
+      delete playersInfo[botId];
+    }
+  } else {
+    playersInfo[botId] = {
+      name: `${botColor} bot`,
+      color: botColor,
+      botLevel: botLevel,
+    };
+
+    availableUserColors.splice(
+      0,
+      availableUserColors.length,
+      ...availableUserColors.filter(item => item !== botColor)
+    );
+  }
 
   callback({
     success: true,
-    message: 'bot set successfully',
   });
 }
 
 function removeBotPlayers() {
-  [0, 1, 2].forEach(id => {
+  ['bot1', 'bot2', 'bot3'].forEach(id => {
     if (playersInfo[id]) {
       const PlayerInfo = playersInfo[id];
       if (PlayerInfo) {

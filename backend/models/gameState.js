@@ -1,4 +1,4 @@
-import { getPlayersInfo } from '../utils/playerUtils.js';
+import { playersInfo } from '../utils/playerUtils.js';
 import { players } from './players.js';
 import { resources } from './resources.js';
 import { gameLoop } from './gameLoop.js';
@@ -42,7 +42,7 @@ export default class GameState {
     players.emptyPlayers();
     resources.resetResources();
 
-    Object.values(getPlayersInfo()).forEach(playerInfo => {
+    Object.values(playersInfo).forEach(playerInfo => {
       players.initializePlayer(playerInfo.name);
     });
   }

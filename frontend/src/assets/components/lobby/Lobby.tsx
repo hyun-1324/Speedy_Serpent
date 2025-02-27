@@ -11,7 +11,6 @@ import { SocketEvent } from '../../types/enums';
 
 const Lobby: FC = () => {
   const [stateMessage, setStateMessage] = useState<LobbyMessage>('');
-  const [isMultiplayer, setIsMultiplayer] = useState<boolean>(true);
 
   const {
     gameState,
@@ -25,18 +24,32 @@ const Lobby: FC = () => {
   const isHost = gameState.host == gameState.me;
   const additionalMessage = gameState.lobbyMessage;
   const roundInMins = timer.roundDuration / 60;
+  const isMultiplayer = gameState.isMultiplayer;
 
   useEffect(() => {
-    if (playersList.length === 1) {
+    if (!isHost && isMultiplayer) {
       setStateMessage('Waiting for others to join the game...');
+    } else if (playersList.length === 1 && !isMultiplayer) {
+      setStateMessage('Add AI opponents.');
     } else {
-      if (isHost) {
+      if (isHost && isMultiplayer) {
         setStateMessage('Start the game when everyone is ready!');
+      } else if (isHost && !isMultiplayer) {
+        setStateMessage('Start the game when you are ready!');
       } else {
         setStateMessage('Waiting for the host to start the game...');
       }
     }
-  }, [playersList, isHost]);
+  }, [playersList, isHost, isMultiplayer]);
+
+  const handleToggle = () => {
+    setGameState(prevState => ({
+      ...prevState,
+      isMultiplayer: !prevState.isMultiplayer,
+    }));
+
+    socket.emit(SocketEvent.TogglePlayMode);
+  };
 
   return (
     <div id="lobby" className="contentBox flexColumn">
@@ -84,13 +97,7 @@ const Lobby: FC = () => {
           <>
             <div className="center width190">
               <p className="margin0 smallFont">Game Mode:</p>
-              <Toggle
-                isMultiplayer={isMultiplayer}
-                onToggle={() => {
-                  setIsMultiplayer(!isMultiplayer);
-                  socket.emit(SocketEvent.TogglePlayMode);
-                }}
-              />
+              <Toggle isMultiplayer={isMultiplayer} onToggle={handleToggle} />
               {isMultiplayer ? (
                 <p className="margin0 smallFont">Multiplayer mode enabled!</p>
               ) : (

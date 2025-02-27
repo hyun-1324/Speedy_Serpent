@@ -2,6 +2,8 @@ import { SEGMENT_SIZE, BOARD_HEIGHT, BOARD_WIDTH } from '../../constants.js';
 
 import { handleCollisions } from '../utils/collisionUtils.js';
 
+import { playersInfo } from '../utils/playerUtils.js';
+
 import { gameState } from '../app.mjs';
 
 class PlayerState {
@@ -17,6 +19,13 @@ class PlayerState {
 
   getPlayers() {
     return this.players;
+  }
+
+  getPlayerNamesAndSnakes() {
+    return this.players.map(player => ({
+      name: player.name,
+      snake: player.snake,
+    }));
   }
 
   getPlayersForGameState() {
@@ -44,6 +53,7 @@ class PlayerState {
       this.startingPositions[
         playerIndex !== -1 ? playerIndex : this.players.length
       ];
+    const botLevel = getBotLevelByName(playersInfo, name);
     let snakeDirection = 'up';
     if (startPosition.y == BOARD_HEIGHT - SEGMENT_SIZE * 5) {
       snakeDirection = 'down';
@@ -61,6 +71,7 @@ class PlayerState {
       buffEnding: false,
       moveCounter: 0,
       plainCounter: 0,
+      botLevel: botLevel,
       speedEffectTimer: null,
       remainingBuffDuration: 0,
       snake: {
@@ -203,6 +214,15 @@ class PlayerState {
       this.players.splice(playerIndex, 1);
     }
   }
+}
+
+function getBotLevelByName(playersInfo, targetName) {
+  for (const key in playersInfo) {
+    if (playersInfo[key].name === targetName) {
+      return playersInfo[key].botLevel ?? false;
+    }
+  }
+  return false;
 }
 
 export const players = new PlayerState();

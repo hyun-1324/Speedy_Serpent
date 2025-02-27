@@ -70,10 +70,6 @@ function isHost(socketId) {
   return playersInfo[socketId]?.name == hostPlayer;
 }
 
-function getPlayersInfo() {
-  return playersInfo;
-}
-
 export {
   checkPlayerNumber,
   registerPlayer,
@@ -81,6 +77,7 @@ export {
   getHost,
   isPlayerRegistered,
   isHost,
-  getPlayersInfo,
+  playersInfo,
+  availableUserColors,
   MAX_PLAYERS,
 };
