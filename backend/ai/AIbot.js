@@ -147,6 +147,18 @@ function getObstacles(avoidTypes = ['body', 'other-snake']) {
     });
   }
 
+  // Add walls
+  if (avoidTypes.includes('wall')) {
+    for (let x = 0; x < Math.ceil(BOARD_WIDTH / SEGMENT_SIZE); x++) {
+      obstacles.push({ x, y: 0 });
+      obstacles.push({ x, y: Math.floor(BOARD_HEIGHT / SEGMENT_SIZE) - 1 });
+    }
+    for (let y = 0; y < Math.ceil(BOARD_HEIGHT / SEGMENT_SIZE); y++) {
+      obstacles.push({ x: 0, y });
+      obstacles.push({ x: Math.floor(BOARD_WIDTH / SEGMENT_SIZE) - 1, y });
+    }
+  }
+
   return obstacles;
 }
 
@@ -172,6 +184,11 @@ function findPathToTarget(bot, target, avoidTypes) {
   };
 
   const botHead = bot.snake.lastConfirmedPosition.head;
+  console.log(calculateDistance(botHead, target));
+
+  if (calculateDistance(botHead, target) < 50) {
+    return calculateDirectApproach(botHead, target);
+  }
 
   // Try direct approach first - simple and usually works
   const directDirection = calculateDirectApproach(botHead, target);
@@ -235,6 +252,18 @@ function getRandomSafeDirection(bot, avoidTypes) {
   return possibleDirections.length > 0
     ? possibleDirections[Math.floor(Math.random() * possibleDirections.length)]
     : currentDirection;
+}
+
+function calculateDirectApproach(botHead, target) {
+  const dx = target.x - botHead.x;
+  const dy = target.y - botHead.y;
+
+  // Determine primary direction by checking which axis has the larger distance
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return dx > 0 ? 'right' : 'left';
+  } else {
+    return dy > 0 ? 'up' : 'down';
+  }
 }
 
 //-------- Behaviors --------//
