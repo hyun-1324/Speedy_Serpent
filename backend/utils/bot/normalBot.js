@@ -1,7 +1,7 @@
 import { findPathToTarget } from './aStarAlgorithm.js';
 import { findNearestResource, difficultyProbabilities } from './botUtils.js';
 
-function processSafeBot(bot, playerPositions, resourcesList) {
+function processNormalBot(bot, playerPositions, resourcesList) {
   const botHead = bot.snake.predictedPosition.head;
 
   // Adjust behavior based on difficulty
@@ -22,4 +22,4 @@ function processSafeBot(bot, playerPositions, resourcesList) {
   }
 }
 
-export { processSafeBot };
+export { processNormalBot };

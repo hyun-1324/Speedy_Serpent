@@ -5,10 +5,10 @@ import { BotColor, BotId, BotLevel, BotBehavior } from '../../types/types';
 
 const botId: BotId[] = ['bot1', 'bot2', 'bot3'];
 const botLevels: BotLevel[] = ['none', 'easy', 'medium', 'hard'];
-const botBehaviors: BotBehavior[] = ['safe', 'aggressive', 'bold'];
+const botBehaviors: BotBehavior[] = ['normal', 'aggressive', 'bold'];
 const playerColors: BotColor[] = ['red', 'green', 'yellow', 'blue'];
 const behaviorDisplayNames = {
-  safe: 'Safe',
+  normal: 'Normal',
   aggressive: 'Aggressive',
   bold: 'Bold',
 };
@@ -36,9 +36,9 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
   const [botBehaviorsState, setBotBehaviorsState] = useState<{
     [key in BotId]?: BotBehavior;
   }>({
-    bot1: 'safe',
-    bot2: 'safe',
-    bot3: 'safe',
+    bot1: 'normal',
+    bot2: 'normal',
+    bot3: 'normal',
   });
 
   const sendBotLevelChange = (
@@ -73,7 +73,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
 
     if (newColor || botColors[botId]) {
       const assignedColor = botColors[botId] || newColor;
-      const currentBehavior = botBehaviorsState[botId] || 'safe';
+      const currentBehavior = botBehaviorsState[botId] || 'normal';
 
       setBotColors(prevColors => ({
         ...prevColors,
@@ -121,19 +121,6 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
     });
   };
 
-  const handleBotLevelChange = (
-    botName: string,
-    level: string,
-    behavior: string
-  ) => {
-    // 서버에 변경사항 전송
-    socket.emit('updateBotSettings', {
-      playerName: botName,
-      botLevel: level,
-      botBehavior: behavior,
-    });
-  };
-
   return (
     <div className="flexColumn">
       <div className={`${gameState.players[0].color} playerBox`}>
@@ -165,7 +152,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
             <select
               className="botBehaviorSelect"
               onChange={e => sendBotBehaviorChange(e, id)}
-              value={botBehaviorsState[id] || 'safe'}
+              value={botBehaviorsState[id] || 'normal'}
             >
               {botBehaviors.map(behavior => (
                 <option key={behavior} value={behavior}>

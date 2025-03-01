@@ -99,4 +99,16 @@ Every player can:
 
 Instructions how to play the game can be found in the game itself behind the i-button.
 
+## Singleplayer mode
+
+Host may choose to play a singleplayer game against 1-3 AI opponents. A switch to toggle between singleplayer and multiplayer modes is available in the game lobby.
+
+The game provides three strategy profiles for selecting opponents:
+
+Normal Snake: Has no resource preference and gathers all types of nearby resources equally.
+Bold Snake: Prioritizes teleport and speedup resources over others.
+Aggressive Snake: Attempts to attack players who enter a certain range.
+
+Each profile comes with three difficulty levels: Easy, Medium, and Hard. In easier modes, opponents don’t adjust direction as much, which increases their risk of colliding with walls, other snakes, or themselves.
+
 <span style="font-size: 24px;">🐍 Happy gaming! 🐍</span>
