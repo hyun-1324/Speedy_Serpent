@@ -105,9 +105,9 @@ Host may choose to play a singleplayer game against 1-3 AI opponents. A switch t
 
 The game provides three strategy profiles for selecting opponents:
 
-Normal Snake: Has no resource preference and gathers all types of nearby resources equally.
-Bold Snake: Prioritizes teleport and speedup resources over others.
-Aggressive Snake: Attempts to attack players who enter a certain range.
+1. **Normal Snake**: Has no resource preference and gathers all types of nearby resources equally.
+2. **Bold Snake**: Prioritizes teleport and speedup resources over others.
+3. **Aggressive Snake**: Attempts to attack players who enter a certain range.
 
 Each profile comes with three difficulty levels: Easy, Medium, and Hard. In easier modes, opponents don’t adjust direction as much, which increases their risk of colliding with walls, other snakes, or themselves.
 
