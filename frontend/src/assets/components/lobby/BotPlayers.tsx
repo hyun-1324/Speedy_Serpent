@@ -5,16 +5,12 @@ import { BotColor, BotId, BotLevel, BotBehavior } from '../../types/types';
 
 const botId: BotId[] = ['bot1', 'bot2', 'bot3'];
 const botLevels: BotLevel[] = ['none', 'easy', 'medium', 'hard'];
-const botBehaviors: BotBehavior[] = [
-  'safeAndEfficient',
-  'aggressive',
-  'boldAndFastPaced',
-];
+const botBehaviors: BotBehavior[] = ['safe', 'aggressive', 'bold'];
 const playerColors: BotColor[] = ['red', 'green', 'yellow', 'blue'];
 const behaviorDisplayNames = {
-  safeAndEfficient: 'Safe and Efficient',
+  safe: 'Safe',
   aggressive: 'Aggressive',
-  boldAndFastPaced: 'Bold and Fast-paced',
+  bold: 'Bold',
 };
 
 const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
@@ -40,16 +36,10 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
   const [botBehaviorsState, setBotBehaviorsState] = useState<{
     [key in BotId]?: BotBehavior;
   }>({
-    bot1: 'safeAndEfficient',
-    bot2: 'safeAndEfficient',
-    bot3: 'safeAndEfficient',
+    bot1: 'safe',
+    bot2: 'safe',
+    bot3: 'safe',
   });
-
-  const formatBotConfig = (level: BotLevel, behavior: BotBehavior): string => {
-    if (level === 'none') return 'none';
-    const behaviorName = behaviorDisplayNames[behavior];
-    return `${level}(${behaviorName})`;
-  };
 
   const sendBotLevelChange = (
     event: React.ChangeEvent<HTMLSelectElement>,
@@ -83,7 +73,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
 
     if (newColor || botColors[botId]) {
       const assignedColor = botColors[botId] || newColor;
-      const currentBehavior = botBehaviorsState[botId] || 'safeAndEfficient';
+      const currentBehavior = botBehaviorsState[botId] || 'safe';
 
       setBotColors(prevColors => ({
         ...prevColors,
@@ -95,12 +85,11 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
       }));
 
       // Convert to old format for backward compatibility
-      const formattedBotLevel = formatBotConfig(botLevel, currentBehavior);
 
       socket.emit('registerBotPlayer', {
         botId: botId,
         botColor: assignedColor,
-        botLevel: formattedBotLevel,
+        botLevel: botLevel,
         botBehavior: currentBehavior,
       });
     }
@@ -124,13 +113,24 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
 
     const currentColor = botColors[botId];
 
-    const formattedBotLevel = formatBotConfig(currentLevel, botBehavior);
-
     socket.emit('registerBotPlayer', {
       botId: botId,
       botColor: currentColor,
-      botLevel: formattedBotLevel,
+      botLevel: currentLevel,
       botBehavior: botBehavior,
+    });
+  };
+
+  const handleBotLevelChange = (
+    botName: string,
+    level: string,
+    behavior: string
+  ) => {
+    // 서버에 변경사항 전송
+    socket.emit('updateBotSettings', {
+      playerName: botName,
+      botLevel: level,
+      botBehavior: behavior,
     });
   };
 
@@ -165,7 +165,7 @@ const BotPlayers: FC<BotPlayerProps> = ({ player }) => {
             <select
               className="botBehaviorSelect"
               onChange={e => sendBotBehaviorChange(e, id)}
-              value={botBehaviorsState[id] || 'safeAndEfficient'}
+              value={botBehaviorsState[id] || 'safe'}
             >
               {botBehaviors.map(behavior => (
                 <option key={behavior} value={behavior}>

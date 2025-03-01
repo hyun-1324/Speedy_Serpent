@@ -10,10 +10,22 @@ class PlayerState {
   constructor() {
     this.players = [];
     this.startingPositions = [
-      { x: SEGMENT_SIZE * 5, y: SEGMENT_SIZE * 5 },
-      { x: BOARD_WIDTH - SEGMENT_SIZE * 5, y: BOARD_HEIGHT - SEGMENT_SIZE * 5 },
-      { x: BOARD_WIDTH - SEGMENT_SIZE * 5, y: SEGMENT_SIZE * 5 },
-      { x: SEGMENT_SIZE * 5, y: BOARD_HEIGHT - SEGMENT_SIZE * 5 },
+      { x: SEGMENT_SIZE * 3, y: SEGMENT_SIZE * 5, direction: 'up' },
+      {
+        x: BOARD_WIDTH - SEGMENT_SIZE * 3,
+        y: BOARD_HEIGHT - SEGMENT_SIZE * 5,
+        direction: 'down',
+      },
+      {
+        x: BOARD_WIDTH - SEGMENT_SIZE * 5,
+        y: SEGMENT_SIZE * 3,
+        direction: 'left',
+      },
+      {
+        x: SEGMENT_SIZE * 5,
+        y: BOARD_HEIGHT - SEGMENT_SIZE * 3,
+        direction: 'right',
+      },
     ];
   }
 
@@ -49,18 +61,12 @@ class PlayerState {
     }
 
     const playerIndex = this.players.findIndex(p => p.name === name);
-    const startPosition =
-      this.startingPositions[
-        playerIndex !== -1 ? playerIndex : this.players.length
-      ];
-    const botLevel = getBotLevelByName(playersInfo, name);
-    let snakeDirection = 'up';
-    if (startPosition.y == BOARD_HEIGHT - SEGMENT_SIZE * 5) {
-      snakeDirection = 'down';
-    }
 
-    const snakeDirectionMultiplier =
-      startPosition.y === SEGMENT_SIZE * 5 ? 1 : -1;
+    const startPosition = this.startingPositions[this.players.length];
+    const snakeDirection = startPosition.direction;
+
+    const botLevel = getBotLevel(playersInfo, name);
+    const botBehavior = getBotBehavior(playersInfo, name);
 
     const playerConfig = {
       name,
@@ -72,6 +78,7 @@ class PlayerState {
       moveCounter: 0,
       plainCounter: 0,
       botLevel: botLevel,
+      botBehavior: botBehavior,
       speedEffectTimer: null,
       remainingBuffDuration: 0,
       snake: {
@@ -81,12 +88,36 @@ class PlayerState {
           head: { ...startPosition },
           body: [
             {
-              x: startPosition.x,
-              y: startPosition.y - 1 * snakeDirectionMultiplier * SEGMENT_SIZE,
+              x:
+                startPosition.x +
+                (snakeDirection === 'left'
+                  ? SEGMENT_SIZE
+                  : snakeDirection === 'right'
+                  ? -SEGMENT_SIZE
+                  : 0),
+              y:
+                startPosition.y +
+                (snakeDirection === 'up'
+                  ? -SEGMENT_SIZE
+                  : snakeDirection === 'down'
+                  ? SEGMENT_SIZE
+                  : 0),
             },
             {
-              x: startPosition.x,
-              y: startPosition.y - 2 * snakeDirectionMultiplier * SEGMENT_SIZE,
+              x:
+                startPosition.x +
+                (snakeDirection === 'left'
+                  ? 2 * SEGMENT_SIZE
+                  : snakeDirection === 'right'
+                  ? -2 * SEGMENT_SIZE
+                  : 0),
+              y:
+                startPosition.y +
+                (snakeDirection === 'up'
+                  ? -2 * SEGMENT_SIZE
+                  : snakeDirection === 'down'
+                  ? 2 * SEGMENT_SIZE
+                  : 0),
             },
           ],
         },
@@ -94,12 +125,36 @@ class PlayerState {
           head: { ...startPosition },
           body: [
             {
-              x: startPosition.x,
-              y: startPosition.y - 1 * snakeDirectionMultiplier * SEGMENT_SIZE,
+              x:
+                startPosition.x +
+                (snakeDirection === 'left'
+                  ? SEGMENT_SIZE
+                  : snakeDirection === 'right'
+                  ? -SEGMENT_SIZE
+                  : 0),
+              y:
+                startPosition.y +
+                (snakeDirection === 'up'
+                  ? -SEGMENT_SIZE
+                  : snakeDirection === 'down'
+                  ? SEGMENT_SIZE
+                  : 0),
             },
             {
-              x: startPosition.x,
-              y: startPosition.y - 2 * snakeDirectionMultiplier * SEGMENT_SIZE,
+              x:
+                startPosition.x +
+                (snakeDirection === 'left'
+                  ? 2 * SEGMENT_SIZE
+                  : snakeDirection === 'right'
+                  ? -2 * SEGMENT_SIZE
+                  : 0),
+              y:
+                startPosition.y +
+                (snakeDirection === 'up'
+                  ? -2 * SEGMENT_SIZE
+                  : snakeDirection === 'down'
+                  ? 2 * SEGMENT_SIZE
+                  : 0),
             },
           ],
         },
@@ -216,10 +271,19 @@ class PlayerState {
   }
 }
 
-function getBotLevelByName(playersInfo, targetName) {
+function getBotLevel(playersInfo, targetName) {
   for (const key in playersInfo) {
     if (playersInfo[key].name === targetName) {
       return playersInfo[key].botLevel ?? false;
+    }
+  }
+  return false;
+}
+
+function getBotBehavior(playersInfo, targetName) {
+  for (const key in playersInfo) {
+    if (playersInfo[key].name === targetName) {
+      return playersInfo[key].botBehavior ?? false;
     }
   }
   return false;

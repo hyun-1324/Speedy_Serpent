@@ -12,7 +12,7 @@ function registerBotPlayer(botId, botColor, botLevel, botBehavior, callback) {
       name: `${botColor} bot`,
       color: botColor,
       botLevel: botLevel,
-      ...(botBehavior && { botBehavior }),
+      botBehavior: botBehavior,
     };
 
     availableUserColors.splice(
@@ -38,4 +38,5 @@ function removeBotPlayers() {
     }
   });
 }
+
 export { registerBotPlayer, removeBotPlayers };

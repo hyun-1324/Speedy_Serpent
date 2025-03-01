@@ -1,13 +1,9 @@
 import { gameState } from '../app.mjs';
 import { players } from './players.js';
 import { resources } from './resources.js';
-import {
-  MOVE_INTERVAL,
-  DEFAULT_GAME_DURATION,
-  SEGMENT_SIZE,
-} from '../../constants.js';
+import { MOVE_INTERVAL, DEFAULT_GAME_DURATION } from '../../constants.js';
 import { isMultyPlay } from '../utils/playModeUtils.js';
-import { processAIBot } from '../ai/AIbot.js';
+import { processAIBots } from '../utils/bot/AIbot.js';
 
 class GameLoop {
   constructor() {
@@ -53,6 +49,9 @@ class GameLoop {
         if (elapsedTime >= this.moveInterval / 2) {
           const isSpeedupTurn = this.iterationCounter % 2 === 1;
           this.processMovement(io, isSpeedupTurn);
+          if (!isMultyPlay) {
+            processAIBots(players, resources);
+          }
 
           lastUpdateTime = now;
 
@@ -107,16 +106,6 @@ class GameLoop {
 
     players.getPlayers().forEach(player => {
       if (player.isAlive && (!isSpeedupTurn || player.speedMultiplier > 1)) {
-        if (player.botLevel) {
-          try {
-            const direction = processAIBot(player.name, player.botLevel);
-            if (direction) {
-              players.updatePlayerDirection(player.name, direction);
-            }
-          } catch (error) {
-            console.error(`Error processing AI bot ${player.name}:`, error);
-          }
-        }
         const collisionType = players.movePlayer(player.name, collisionEvents);
         if (collisionType) {
           collisionEvents.push({

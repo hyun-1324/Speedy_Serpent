@@ -218,6 +218,20 @@ io.on('connection', socket => {
     }
   });
 
+  socket.on('updateBotSettings', data => {
+    const { playerName, botLevel, botBehavior } = data;
+    if (playerName && (botLevel || botBehavior)) {
+      const updated = players.updateBotSettings(
+        playerName,
+        botLevel,
+        botBehavior
+      );
+      if (updated) {
+        io.emit('botSettingsUpdated', { playerName, botLevel, botBehavior });
+      }
+    }
+  });
+
   socket.on('disconnect', () => {
     if (!isPlayerRegistered(socket.id)) return;
 
