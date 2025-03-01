@@ -1,4 +1,5 @@
 import { calculateDistance } from './botUtils.js';
+import { BOARD_WIDTH, BOARD_HEIGHT, SEGMENT_SIZE } from '../../../constants.js';
 
 // A* Pathfinding algorithm
 function findPathToTarget(start, goal, obstacles, maxIterations = 1000) {
@@ -59,6 +60,17 @@ function findPathToTarget(start, goal, obstacles, maxIterations = 1000) {
         x: current.x + dir.x,
         y: current.y + dir.y,
       };
+
+      // Wall collision prevention logic
+      // Check game board boundaries
+      if (
+        neighbor.x < 0 ||
+        neighbor.x >= BOARD_WIDTH ||
+        neighbor.y < 0 ||
+        neighbor.y >= BOARD_HEIGHT
+      ) {
+        continue; // Skip this position if outside the board
+      }
 
       // Check if neighbor is in obstacles
       if (obstacles.some(obs => obs.x === neighbor.x && obs.y === neighbor.y)) {

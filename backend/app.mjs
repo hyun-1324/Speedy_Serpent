@@ -18,7 +18,7 @@ import {
 } from './utils/playerUtils.js';
 import { registerBotPlayer, removeBotPlayers } from './utils/botPlayerUtils.js';
 import { isMultyPlay, togglePlayMode } from './utils/playModeUtils.js';
-import cors from 'cors';
+// import cors from 'cors';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -34,23 +34,23 @@ const io = new socketIo(server, {
 
 const gameState = new GameState();
 
-// dev mode
-app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
+// // dev mode
+// app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 
 // Serve static files with cache control
 // Serve built files
-// app.use(
-//   express.static(path.join(__dirname, '../frontend/dist'), {
-//     maxAge: 86400000,
-//     setHeaders: (res, path) => {
-//       res.setHeader('Cache-Control', 'public, max-age=86400');
-//     },
-//   })
-// // );
+app.use(
+  express.static(path.join(__dirname, '../frontend/dist'), {
+    maxAge: 86400000,
+    setHeaders: (res, path) => {
+      res.setHeader('Cache-Control', 'public, max-age=86400');
+    },
+  })
+);
 
-// app.get('/', (req, res) => {
-//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-// });
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 io.on('connection', socket => {
   if (!isMultyPlay && !isHost(socket.id)) {
