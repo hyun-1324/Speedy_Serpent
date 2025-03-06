@@ -5,12 +5,13 @@ import { BotColor, BotId, BotLevel, BotBehavior } from '../../types/types';
 
 const botId: BotId[] = ['bot1', 'bot2', 'bot3'];
 const botLevels: BotLevel[] = ['none', 'easy', 'medium', 'hard'];
-const botBehaviors: BotBehavior[] = ['normal', 'aggressive', 'bold'];
+const botBehaviors: BotBehavior[] = ['normal', 'aggressive', 'bold', 'safe'];
 const playerColors: BotColor[] = ['red', 'green', 'yellow', 'blue'];
 const behaviorDisplayNames = {
   normal: 'Normal',
   aggressive: 'Aggressive',
   bold: 'Bold',
+  safe: 'Safe',
 };
 
 const BotPlayers: FC<BotPlayerProps> = ({ player }) => {

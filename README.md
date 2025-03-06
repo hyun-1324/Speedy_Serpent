@@ -108,6 +108,7 @@ The game provides three strategy profiles for selecting opponents:
 1. **Normal Snake**: Has no resource preference and gathers all types of nearby resources equally.
 2. **Bold Snake**: Prioritizes teleport and speedup resources over others.
 3. **Aggressive Snake**: Attempts to attack players who enter a certain range.
+4. **Safe Snake**: Prioritizes safety by first gathering plain and slowdown resources, then speedup resources. Avoids teleport resources to maintain safe positioning.
 
 Each profile comes with three difficulty levels: Easy, Medium, and Hard. In easier modes, opponents don’t adjust direction as much, which increases their risk of colliding with walls, other snakes, or themselves.
 

@@ -33,7 +33,7 @@ export type BotId = 'bot1' | 'bot2' | 'bot3';
 
 export type BotLevel = 'none' | 'easy' | 'medium' | 'hard';
 
-export type BotBehavior = 'normal' | 'aggressive' | 'bold';
+export type BotBehavior = 'normal' | 'aggressive' | 'bold' | 'safe';
 
 export type RegistrationResultMessage =
   | 'Name already taken'

@@ -1,6 +1,7 @@
 import { processNormalBot } from './normalBot.js';
 import { processBoldBot } from './boldBot.js';
 import { processAggressiveBot } from './aggressiveBot.js';
+import { processSafeBot } from './safeBot.js';
 import {
   skipTurn,
   getNextGrid,
@@ -85,6 +86,8 @@ function calculatePath(
       );
     case 'bold':
       return processBoldBot(player, playerPositions, resourcesList);
+    case 'safe':
+      return processSafeBot(player, playerPositions, resourcesList);
     case 'normal':
       return processNormalBot(player, playerPositions, resourcesList);
   }

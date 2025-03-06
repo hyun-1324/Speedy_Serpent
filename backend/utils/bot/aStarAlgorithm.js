@@ -2,7 +2,7 @@ import { calculateDistance } from './botUtils.js';
 import { BOARD_WIDTH, BOARD_HEIGHT, SEGMENT_SIZE } from '../../../constants.js';
 
 // A* Pathfinding algorithm
-function findPathToTarget(start, goal, obstacles, maxIterations = 1000) {
+function findPathToTarget(start, goal, obstacles) {
   // If start and goal are the same position, return a simple path
   if (start.x === goal.x && start.y === goal.y) {
     return null;
@@ -31,7 +31,7 @@ function findPathToTarget(start, goal, obstacles, maxIterations = 1000) {
 
   let iterations = 0;
 
-  while (openSet.length > 0 && iterations < maxIterations) {
+  while (openSet.length > 0 && iterations < 500) {
     iterations++;
 
     // Find node with lowest fScore in openSet
@@ -63,6 +63,7 @@ function findPathToTarget(start, goal, obstacles, maxIterations = 1000) {
 
       // Wall collision prevention logic
       // Check game board boundaries
+
       if (
         neighbor.x < 0 ||
         neighbor.x >= BOARD_WIDTH ||
