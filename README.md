@@ -1,15 +1,64 @@
-# Speedy Serpent
+# 🐍 Speedy Serpent
 
-Speedy Serpent in an online muliplayer game. Game server is designed to host one game at a time for 2-4 players.
+Speedy Serpent in an online muliplayer game with a singleplayer mode against AI opponents. Game server is designed to host one game at a time for 2-4 players.
+
+![Game Demo](./assets/game_demo.gif)
+
+## Features
+
+- Online multiplayer mode for 2-4 players
+- Singleplayer mode against 1-3 AI opponents
+- Sound effects
+- Custmoizable AI oppoents
+- Keyboard controls
+- Adjustable game duration
+- Power-ups:speedup, slowdown and teleport
+- Game can be paused and restarted
+
+## Tech Stack
+
+- Node.Js, express.Js, Socket.IO, React, TypeScript
+
+## My Contribution
+
+- Architected the core game system, defining resource flow, game state transitions, and feature modules.
+- Built a real-time multiplayer backend with Express & Socket.IO, including room and player state logic.
+- Created a consistent game loop with support for pause/resume and randomly spawning items.
+- Implemented precise collision detection and dynamic mode switching between multiplayer and AI-based singleplayer.
+- Created AI opponents using A\* pathfinding, each with unique behavior patterns and difficulty levels.
+
+## What I Learned
+
+- Real-time multiplayer networking fundamentals.
+- Frame-rate–based game-loop design and speed control.
+- Resource & state management patterns in online games.
+- Performance optimization techniques
+- Decision-making and pathfinding logic for AI opponents.
+
+## What I Would Improve
+
+- Support multiple simultaneous game sessions.
+- Introduce a global leaderboard for top scores.
+- Make keyboard input feel even more responsive.
 
 ## Set up the game
 
+Clone this repository
+
+````
+
+git clone https://github.com/hyun-1324/Speedy_Serpent.git
+
+```sh
+
 Make sure you have `node` and `npm` installed.
 
-```
+````
+
 npm -v
 node -v
-```
+
+````
 
 If these commands print version numbers to the console, you are good to go. Otherwise install them.
 
@@ -17,7 +66,7 @@ To set up the game, run the following command **in the root directory** of the p
 
 ```sh
 node setup.mjs
-```
+````
 
 Once the project is set up, start the server with the command:
 
@@ -44,7 +93,7 @@ ngrok http 3000
 
 Now your terminal should show something like this:
 
-![ngrok](image.png)
+![ngrok](assets/ngrok.png)
 
 Copy the URL that can be found in the `forwarding` field and open it in the browser.
 
@@ -113,3 +162,8 @@ The game provides three strategy profiles for selecting opponents:
 Each profile comes with three difficulty levels: Easy, Medium, and Hard. In easier modes, opponents don’t adjust direction as much, which increases their risk of colliding with walls, other snakes, or themselves.
 
 <span style="font-size: 24px;">🐍 Happy gaming! 🐍</span>
+
+## License
+
+This project is licensed under the MIT License.
+See the [LICENSE](./LICENSE) file for details.
