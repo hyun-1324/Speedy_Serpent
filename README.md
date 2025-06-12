@@ -45,33 +45,38 @@ Speedy Serpent in an online muliplayer game with a singleplayer mode against AI 
 
 Clone this repository
 
-````
+```sh
 
 git clone https://github.com/hyun-1324/Speedy_Serpent.git
 
-```sh
+
+```
 
 Make sure you have `node` and `npm` installed.
 
-````
+```sh
 
 npm -v
 node -v
 
-````
+```
 
 If these commands print version numbers to the console, you are good to go. Otherwise install them.
 
 To set up the game, run the following command **in the root directory** of the project:
 
 ```sh
+
 node setup.mjs
-````
+
+```
 
 Once the project is set up, start the server with the command:
 
 ```sh
+
 npm run start
+
 ```
 
 Note that if any changes are made to the project during review, you should run the setup again.
@@ -87,8 +92,10 @@ https://download.ngrok.com/linux?tab=install
 
 Use the following command on a separate terminal to start ngrok:
 
-```
+```sh
+
 ngrok http 3000
+
 ```
 
 Now your terminal should show something like this:
