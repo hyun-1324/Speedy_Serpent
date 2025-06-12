@@ -49,7 +49,6 @@ Clone this repository
 
 git clone https://github.com/hyun-1324/Speedy_Serpent.git
 
-
 ```
 
 Make sure you have `node` and `npm` installed.
